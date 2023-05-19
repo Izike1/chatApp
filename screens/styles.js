@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     form: {
         flex: 1,
         justifyContent: "center",
-        paddingTop: 100,
+        paddingTop: 160,
         marginHorizontal: 30,
     },
     button: {

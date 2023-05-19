@@ -1,39 +1,38 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { View,  Image, TouchableOpacity, StyleSheet, Text} from "react-native";
-import { firestore } from '../config/firebase'
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { FontAwesome } from '@expo/vector-icons';
+import { collection, getDocs } from "firebase/firestore";
+import { database } from "../config/firebase";
+import { Entypo, FontAwesome } from '@expo/vector-icons';
 import colors from '../colors';
-import { Entypo } from '@expo/vector-icons';
 import UserList from "../components/UserList";
+
 const catImageUrl = "https://i.guim.co.uk/img/media/26392d05302e02f7bf4eb143bb84c8097d09144b/446_167_3683_2210/master/3683.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=49ed3252c0b2ffb49cf8b508892e452d";
 
 const Home = () => {
-    const [selectedRecipient, setSelectedRecipient] = useState(null);
+    const [selectedRecipient, setSelectedRecipient] = useState(null)
+    const [users, setUsers] = useState([]);
     const navigation = useNavigation()
-
+    const usersCollectionRef = collection(database, 'users');
     const handleSelectRecipient = (recipientId) => {
-        setSelectedRecipient(recipientId)
+        setSelectedRecipient(recipientId);
+        navigation.navigate('Chat', recipientId);
+    };
+    const getUsers = async () => {
+        try {
+            const querySnapshot = await getDocs(usersCollectionRef);
+            const userData = querySnapshot.docs.map((doc) => doc.data())
+            setUsers(userData);
+        }
+        catch (e) {
+            console.error("Error get users", e)
+            setUsers([])
+        }
     }
-    const users = [
-        { id: '1', name: 'User 1' },
-        { id: '2', name: 'User 2' },
-        { id: '3', name: 'User 3' },
-        // Добавьте других пользователей в список
-    ];
-    // const getUsers = async () =>  {
-    //     const usersCollection = await firestore.collection('users');
-    //     const snapshot = await usersCollection.get();
-    //     const users = []
-    //     snapshot.forEach((doc) => {
-    //         users.push({id: doc.id, ...doc.data()})
-    //     })
-    //     return users
-    // }
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
-                <FontAwesome name="search" size={24} color={colors.gray} style={{marginLeft: 15}}/>
+                <FontAwesome name="search" size={24} color={colors.gray} style={{ marginLeft: 15 }} />
             ),
             headerRight: () => (
                 <Image
@@ -46,6 +45,7 @@ const Home = () => {
                 />
             ),
         });
+        getUsers().then(r => r);
     }, [navigation]);
 
     return (
@@ -57,8 +57,7 @@ const Home = () => {
                 <Entypo name="chat" size={24} color={colors.lightGray} />
             </TouchableOpacity>
             <View style={styles.userList}>
-                <Text style={{marginBottom: 10}}>Selected Recipient: {selectedRecipient}</Text>
-                <UserList users={users} onSelectRecipient={handleSelectRecipient}/>
+                <UserList users={users} onSelectRecipient={handleSelectRecipient} />
             </View>
         </View>
     )

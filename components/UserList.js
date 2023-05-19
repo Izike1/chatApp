@@ -9,29 +9,28 @@ const UserList = ({ users, onSelectRecipient }) => {
         onSelectRecipient(recipientId);
     };
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={{
-                paddingVertical: 10,
-                paddingHorizontal: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: '#EAEAEA',
-            }}
-            onPress={() => handleSelectRecipient(item.id)}
-        >
-            <Text style={{ fontSize: 16 }}>{item.name}</Text>
-        </TouchableOpacity>
-    );
-
     return (
         <View>
             <FlatList
                 data={users}
-                renderItem={renderItem}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 16,
+                            borderBottomWidth: 1,
+                            borderBottomColor: '#EAEAEA',
+                        }}
+                        onPress={() => handleSelectRecipient(item.id)}
+                    >
+                        <Text style={{ fontSize: 16 }}>{item.name}</Text>
+                    </TouchableOpacity>
+                )}
                 keyExtractor={(item) => item.id}
                 extraData={selectedRecipient}
             />
         </View>
     );
 };
+
 export default UserList;
