@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { collection, getDocs } from "firebase/firestore";
 import { database } from "../config/firebase";
-import { Entypo, FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import colors from '../colors';
 import UserList from "../components/UserList";
 
@@ -50,12 +50,6 @@ const Home = () => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate("Chat")}
-                style={styles.chatButton}
-            >
-                <Entypo name="chat" size={24} color={colors.lightGray} />
-            </TouchableOpacity>
             <View style={styles.userList}>
                 <UserList users={users} onSelectRecipient={handleSelectRecipient} />
             </View>

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { Text, View, TextInput, Image, SafeAreaView, TouchableOpacity, Alert} from "react-native";
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import {auth} from "../config/firebase";
+import { auth } from "../config/firebase";
 const bgImage = require('../assets/BgImage.png');
 import styles from './styles'
 export default function Login ({ navigation }) {

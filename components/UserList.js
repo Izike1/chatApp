@@ -6,7 +6,7 @@ const UserList = ({ users, onSelectRecipient }) => {
 
     const handleSelectRecipient = (recipientId) => {
         setSelectedRecipient(recipientId);
-        onSelectRecipient(recipientId);
+        onSelectRecipient({recipientId});
     };
 
     return (
