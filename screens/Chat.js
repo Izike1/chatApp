@@ -1,8 +1,8 @@
-import React, { useState, useLayoutEffect, useCallback } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+import { addDoc, collection, doc, onSnapshot, setDoc } from '@firebase/firestore';
+import { signOut } from '@firebase/auth';
 import { auth, database } from '../config/firebase';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
@@ -13,7 +13,7 @@ export default function Chat({ route }) {
     const [messages, setMessages] = useState([]);
     const navigation = useNavigation();
 
-    const chatId = recipientId;
+    const chatId = [auth.currentUser.uid, recipientId].sort().join('_');
 
     const onSignOut = () => {
         signOut(auth).catch(error => console.log('Error logging out: ', error));
@@ -38,12 +38,7 @@ export default function Chat({ route }) {
     }, [navigation]);
 
     useLayoutEffect(() => {
-        const collectionRef = collection(
-            database,
-            'chats',
-            recipientId,
-            'messages'
-        );
+        const collectionRef = collection(database, 'chats', chatId, 'messages');
 
         const unsubscribe = onSnapshot(collectionRef, snapshot => {
             const loadedMessages = snapshot.docs.map(doc => ({
@@ -52,25 +47,43 @@ export default function Chat({ route }) {
                 text: doc.data().text,
                 user: doc.data().user,
             }));
+            loadedMessages.sort((a, b) => b.createdAt - a.createdAt);
             setMessages(loadedMessages);
         });
 
         return () => unsubscribe();
     }, [recipientId]);
 
+    //const createChat = async (currentUserUid, recipientUid, chatId) => {
+    //    try {
+    //        const chatRef = doc(database, 'chats', chatId);
+    //        const usersCollectionRef = collection(chatRef, 'users');
+
+    //        await setDoc(usersCollectionRef.doc(currentUserUid), { userId: currentUserUid });
+    //        await setDoc(usersCollectionRef.doc(recipientUid), { userId: recipientUid });
+
+    //        console.log('Chat created successfully');
+    //    } catch (error) {
+    //        console.error('Error creating chat:', error);
+    //    }
+    //};
+
     const onSend = useCallback(async (messages = []) => {
+        const currentUserUid = auth.currentUser.uid;
+        //await createChat(currentUserUid, recipientId, chatId);
         const { _id, createdAt, text, user } = messages[0];
 
-        const chatDocRef = doc(database, 'chats', recipientId);
-        const messageCollectionRef = collection(chatDocRef, 'messages');
+        const chatRef = doc(database, 'chats', chatId);
+        const messageCollectionRef = collection(chatRef, 'messages');
 
         await addDoc(messageCollectionRef, {
             _id,
             createdAt,
             text,
             user,
+            recipientId,
         });
-    }, [recipientId]);
+    }, [recipientId, chatId]);
 
     return (
         <GiftedChat
@@ -87,7 +100,7 @@ export default function Chat({ route }) {
             }}
             user={{
                 _id: auth?.currentUser?.uid,
-                avatar: 'https://i.pravatar.cc/300',
+                avatar: 'https://placeimg.com/140/140/any',
             }}
         />
     );
