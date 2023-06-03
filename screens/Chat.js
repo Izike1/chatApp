@@ -38,7 +38,6 @@ export default function Chat({ route }) {
     }, [navigation]);
 
     useLayoutEffect(() => {
-        const chatId = [auth.currentUser.uid, recipientId].sort().join('_');
         const collectionRef = collection(database, 'chats', chatId, 'messages');
 
         const unsubscribe = onSnapshot(collectionRef, snapshot => {
@@ -55,24 +54,23 @@ export default function Chat({ route }) {
         return () => unsubscribe();
     }, [recipientId]);
 
-    const createChat = async (currentUserUid, recipientUid) => {
-        try {
-            const chatRef = doc(database, 'chats', chatId);
-            const usersCollectionRef = collection(chatRef, 'users');
+    //const createChat = async (currentUserUid, recipientUid, chatId) => {
+    //    try {
+    //        const chatRef = doc(database, 'chats', chatId);
+    //        const usersCollectionRef = collection(chatRef, 'users');
 
-            await setDoc(usersCollectionRef.doc(currentUserUid), { userId: currentUserUid });
-            await setDoc(usersCollectionRef.doc(recipientUid), { userId: recipientUid });
+    //        await setDoc(usersCollectionRef.doc(currentUserUid), { userId: currentUserUid });
+    //        await setDoc(usersCollectionRef.doc(recipientUid), { userId: recipientUid });
 
-            console.log('Chat created successfully');
-        } catch (error) {
-            console.error('Error creating chat:', error);
-        }
-    };
+    //        console.log('Chat created successfully');
+    //    } catch (error) {
+    //        console.error('Error creating chat:', error);
+    //    }
+    //};
 
     const onSend = useCallback(async (messages = []) => {
         const currentUserUid = auth.currentUser.uid;
-        await createChat(currentUserUid, recipientId);
-
+        //await createChat(currentUserUid, recipientId, chatId);
         const { _id, createdAt, text, user } = messages[0];
 
         const chatRef = doc(database, 'chats', chatId);
